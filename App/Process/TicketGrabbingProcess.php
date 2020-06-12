@@ -334,11 +334,15 @@ class TicketGrabbingProcess extends AbstractProcess {
 
         //查询是否有未完成订单
         echo '----------------查询未完成订单--------------------' . PHP_EOL;
-        $queryMyOrderNoComplete = Api::getInstance()->queryMyOrderNoComplete($this->headers);
-        if (!empty($queryMyOrderNoComplete['data']['orderDBList'])) {
-            return true;
+        do {
+            $queryMyOrderNoComplete = Api::getInstance()->queryMyOrderNoComplete($this->headers);
+            \Co::sleep(1);
+        } while (empty($queryMyOrderNoComplete['data']['orderDBList']) && (time() - $time) < 10);
+
+        if (empty($queryMyOrderNoComplete['data']['orderDBList'])) {
+            return false;
         }
-        return false;
+        return true;
     }
 
     /**
