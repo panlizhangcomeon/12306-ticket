@@ -7,8 +7,9 @@ namespace Composer\Autoload;
 class ComposerStaticInitee0be9f669d3177d39b7eacfd8f66763
 {
     public static $files = array (
-        '538ca81a9a966a6716601ecf48f4eaef' => __DIR__ . '/..' . '/opis/closure/functions.php',
         '253c157292f75eb38082b5acb06f3f01' => __DIR__ . '/..' . '/nikic/fast-route/src/functions.php',
+        '538ca81a9a966a6716601ecf48f4eaef' => __DIR__ . '/..' . '/opis/closure/functions.php',
+        '437c42e15993211e19220ce4ccd054c1' => __DIR__ . '/../..' . '/App/helper.php',
     );
 
     public static $prefixLengthsPsr4 = array (
