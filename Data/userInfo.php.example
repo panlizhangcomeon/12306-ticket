@@ -1,0 +1,11 @@
+<?php
+/**
+ * 订票个人信息
+ */
+    return array(
+    'train_username' => 'xxx', //12306账号
+    'train_password' => 'xxx', //12306密码
+    'my_name' => 'xxx', //名字
+    'my_card' => 'xxxx***********xxx', //身份证
+    'my_phone' => 'xxx****xxxx' //手机号
+);

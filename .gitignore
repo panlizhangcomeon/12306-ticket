@@ -1,0 +1,8 @@
+.idea/
+Log/
+nbproject/*
+composer.lock
+Temp/
+Data/*.php
+Data/*.jpg
+Data/*.txt

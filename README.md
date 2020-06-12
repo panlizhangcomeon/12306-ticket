@@ -1,2 +1,2 @@
-# 12306-ticket
-EasySwoole实现12306抢票程序
+# 12306-tickets
+12306抢票(EasySwoole实现)
