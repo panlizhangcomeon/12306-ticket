@@ -55,7 +55,7 @@ class TicketGrabbingProcess extends AbstractProcess {
 
         // 加载站点
         if (empty($this->train_start) || empty($this->train_end)) {
-            $favoriteNames = Api::getInstance()->getStationName('https://kyfw.12306.cn/otn/resources/js/framework/station_name.js');
+            $favoriteNames = Api::getInstance()->getStationName();
             $this->train_start = $favoriteNames[$this->trainInfo['fromStation']][2];
             $this->train_end = $favoriteNames[$this->trainInfo['toStation']][2];
         }
@@ -74,14 +74,14 @@ class TicketGrabbingProcess extends AbstractProcess {
                 }
 
                 //检查登陆状态，状态异常则重新登陆
-                if (!$this->uamtk()) {
+                if (!Api::getInstance()->uamtk()) {
                     echo '重新登陆' . PHP_EOL;
                     $result = $this->getLoginStorage();
                     if (!$result) {
                         echo '登陆失败' . PHP_EOL;
                         break;
                     }
-                    $isLogin = $this->uamtk();
+                    $isLogin = Api::getInstance()->uamtk();
                     if (!$isLogin) {
                         echo '登陆验证失败' . PHP_EOL;
                         break;
@@ -93,7 +93,7 @@ class TicketGrabbingProcess extends AbstractProcess {
 
                 $this->headers = ['Cookie:JSESSIONID='. $this->jsSessionId . '; tk=' . file_get_contents(self::$path . 'newapptk.txt')];
                 //查询未完成订单
-                $queryMyOrderNoComplete = Api::getInstance()->queryMyOrderNoComplete(self::$url, $this->headers);
+                $queryMyOrderNoComplete = Api::getInstance()->queryMyOrderNoComplete($this->headers);
                 if (!empty($queryMyOrderNoComplete['data']['orderDBList'])) {
                     $orderInfo = $this->getOrderInfo($queryMyOrderNoComplete['data']['orderDBList'][0]);
                     echo '您有尚未完成的订单，订单信息 : ' . $orderInfo . '，请前往12306处理' . PHP_EOL;
@@ -124,9 +124,8 @@ class TicketGrabbingProcess extends AbstractProcess {
      * 登陆数据产生
      */
     public function getLoginStorage() {
-        // 获取验证码
-        $data = $this->captchaImage();
-        $this->saveImage($data['image'], self::$path . 'captchaImg.jpg');
+        $data = Api::getInstance()->captchaImage(); // 获取验证码
+        $this->saveImage($data['image'], self::$path . 'captchaImg.jpg'); // 保存验证码图片
         if (!is_file(self::$path . 'coorNum.txt')) {
             File::touchFile(self::$path . 'coorNum.txt');
         }
@@ -137,99 +136,14 @@ class TicketGrabbingProcess extends AbstractProcess {
             $num = file_get_contents(self::$path . 'coorNum.txt');
         }
         $answer = $this->coordinate($num);
-        $result = $this->captchaCheck($answer);
+        $result = Api::getInstance()->captchaCheck($answer); // 验证码校验
         if ($result['result_code'] != 4) {
             echo '验证码校验失败' . PHP_EOL;
             return ['result' => -1, 'errorMsg' => '验证码校验失败'];
         }
         echo '验证码校验成功' . PHP_EOL;
         file_put_contents(self::$path . 'coorNum.txt', '');
-        return $this->login($answer);
-    }
-
-    /**
-     * 登陆12306
-     * @param $answer
-     * @return mixed
-     * Date: 2019/1/12
-     * Time: 09:43
-     * Author: sym
-     */
-    private function login($answer) {
-        $url = self::$url . 'passport/web/login';
-        $get_data = [
-            'username' => $this->userInfo['train_username'],
-            'password' => $this->userInfo['train_password'],
-            'appid'    => 'otn',
-            'answer'   => $answer,
-        ];
-        $get_data = http_build_query($get_data);
-        $data = CURL($url, 1, $get_data, $this->loginHeaders);
-        $arr = json_decode($data, true);
-        if (isset($arr['result_code']) && $arr['result_code'] == 0) {
-            file_put_contents(self::$path . 'uamtk.txt', $arr['uamtk']);
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * 验证是否登陆   验证cookie是否有效
-     * Date: 2019/1/12
-     * Time: 11:19
-     * Author: sym
-     */
-    protected function uamtk() {
-        $url = self::$url . 'passport/web/auth/uamtk';
-        if (!is_file(self::$path . 'uamtk.txt')) {
-            File::touchFile(self::$path . 'uamtk.txt');
-        }
-        $uamtk = file_get_contents(self::$path . 'uamtk.txt');
-        // 获取newapptk
-        $header = ['Cookie:uamtk=' . $uamtk, 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8', 'Referer:https://www.12306.cn/index/index.html'];
-        $uamtk = CURL($url, 1, 'appid=otn', $header);
-        $uamtk = json_decode($uamtk, true);
-        if ($uamtk['result_code'] === 0) {
-            file_put_contents(self::$path . 'newapptk.txt', $uamtk['newapptk']);
-            return true;
-        } else {
-            echo $uamtk['result_message'] . PHP_EOL;
-            return false;
-        }
-    }
-
-    /**
-     * 查询个人信息接口
-     * @param $headers
-     * @return mixed
-     */
-    public function initQueryUserInfoApi($headers) {
-        $url = self::$url . 'otn/modifyUser/initQueryUserInfoApi';
-        $userInfo = CURL($url, 1, '', $headers);
-        $userInfo = json_decode($userInfo, true);
-        return $userInfo;
-    }
-
-    /**
-     * 验证码校验
-     * @param $answer
-     * @return mixed
-     */
-    private function captchaCheck($answer)
-    {
-        $url = self::$url . 'passport/captcha/captcha-check?';
-        $get_data = [
-            'callback'   => 'jQuery19109551424646697575_1547039839380',
-            'answer'     => $answer,
-            'rand'       => 'sjrand',
-            'login_site' => 'E',
-        ];
-        $url = $url . http_build_query($get_data);
-        $data = CURL($url, 1);
-        $str = rtrim($data, ');');
-        $str = ltrim($str, '/**/jQuery19109551424646697575_1547039839380(');
-        $arr = json_decode($str, true);
-        return $arr;
+        return Api::getInstance()->login($this->userInfo['train_username'], $this->userInfo['train_password'], $answer, $this->loginHeaders);
     }
 
     /**
@@ -240,7 +154,7 @@ class TicketGrabbingProcess extends AbstractProcess {
      * Time: 21:40
      * Author: sym
      */
-    private function coordinate($num)
+    public function coordinate($num)
     {
         $coor = [
             '1' => '40,40',
@@ -268,32 +182,12 @@ class TicketGrabbingProcess extends AbstractProcess {
      * @param $path
      * @return bool
      */
-    function saveImage($base64ImgContent, $path){
+    public function saveImage($base64ImgContent, $path){
         if (file_put_contents($path, base64_decode($base64ImgContent))) {
             return true;
         } else {
             return false;
         }
-    }
-
-    /**
-     * 获取验证码
-     * @return mixed
-     */
-    protected function captchaImage() {
-        $url = self::$url . 'passport/captcha/captcha-image64?';
-        $get_data = [
-            'login_site' => 'E',
-            'module'     => 'login',
-            'rand'       => 'sjrand',
-            'callback'   => 'jQuery19109551424646697575_1547039839380',
-        ];
-        $url = $url . http_build_query($get_data);
-        $data = CURL($url);
-        $str = rtrim($data, ');');
-        $str = ltrim($str, '/**/jQuery19109551424646697575_1547039839380(');
-        $arr = json_decode($str, true);
-        return $arr;
     }
 
     /**
@@ -322,7 +216,7 @@ class TicketGrabbingProcess extends AbstractProcess {
     }
 
     /**
-     * 查询车票
+     * 查询车票并下单
      */
     public function query()
     {
@@ -385,7 +279,7 @@ class TicketGrabbingProcess extends AbstractProcess {
         }
 
         // 提交订单请求
-        $submitOrderRequest = $this->submitOrderRequest($query, $this->headers);
+        $submitOrderRequest = Api::getInstance()->submitOrderRequest($this->trainInfo['fromStation'], $this->trainInfo['toStation'], $query, $this->headers);
         echo '----------------提交订单信息--------------------' . PHP_EOL;
         //var_dump($submitOrderRequest);
         if (!$submitOrderRequest['status']) {
@@ -409,7 +303,7 @@ class TicketGrabbingProcess extends AbstractProcess {
         $my_phone = $this->userInfo['my_phone'];
 
         //检查订单信息
-        $checkOrderInfo = $this->checkOrderInfo($my_name, $my_card, $my_phone, $repeat_submit_token, $this->headers);
+        $checkOrderInfo = Api::getInstance()->checkOrderInfo($this->trainInfo['train_seat'], $this->userInfo['user_auth'], $my_name, $my_card, $my_phone, $repeat_submit_token, $this->headers);
         echo '----------------检查订单信息--------------------' . PHP_EOL;
         //var_dump($checkOrderInfo);
         if (!$checkOrderInfo['status']) {
@@ -417,7 +311,7 @@ class TicketGrabbingProcess extends AbstractProcess {
         }
 
         //确认订单
-        $confirmSingleForQueue = $this->confirmSingleForQueue($my_name, $my_card, $my_phone, $key_check_isChange, $leftTicketStr, $query, $repeat_submit_token, $this->headers);
+        $confirmSingleForQueue = Api::getInstance()->confirmSingleForQueue($this->trainInfo['train_seat'], $this->userInfo['user_auth'], $my_name, $my_card, $my_phone, $key_check_isChange, $leftTicketStr, $query, $repeat_submit_token, $this->headers);
         echo '----------------确认订单--------------------' . PHP_EOL;
         var_dump($confirmSingleForQueue);
 
@@ -428,7 +322,7 @@ class TicketGrabbingProcess extends AbstractProcess {
 
         $time = time();
         do {
-            $queryOrderWaitTime = Api::getInstance()->queryOrderWaitTime(self::$url, $repeat_submit_token, $this->headers);
+            $queryOrderWaitTime = Api::getInstance()->queryOrderWaitTime($repeat_submit_token, $this->headers);
             \Co::sleep(1);
         } while (empty($queryOrderWaitTime['data']['orderId']) && (time() - $time) < 10);
 
@@ -438,138 +332,13 @@ class TicketGrabbingProcess extends AbstractProcess {
             return false;
         }
 
-        //订购队列结果
-//        $orderId = $queryOrderWaitTime['data']['orderId'];
-//        var_dump($orderId);
-//        do {
-//            $resultOrderForDcQueue = $this->resultOrderForDcQueue($orderId, $repeat_submit_token, $this->headers);
-//            var_dump($resultOrderForDcQueue['data']['submitStatus']);
-//            \Co::sleep(1);
-//        } while (empty($resultOrderForDcQueue['data']['submitStatus']) && (time() - $time) < 30);
-//
-//        echo '----------------查询订单号是否成功下单--------------------' . PHP_EOL;
-//        var_dump($resultOrderForDcQueue);
-//        if (empty($resultOrderForDcQueue['data']['submitStatus'])) {
-//            return false;
-//        }
-//        return true;
-
         //查询是否有未完成订单
         echo '----------------查询未完成订单--------------------' . PHP_EOL;
-        $queryMyOrderNoComplete = Api::getInstance()->queryMyOrderNoComplete(self::$url, $this->headers);
+        $queryMyOrderNoComplete = Api::getInstance()->queryMyOrderNoComplete($this->headers);
         if (!empty($queryMyOrderNoComplete['data']['orderDBList'])) {
             return true;
         }
         return false;
-    }
-
-    /**
-     * 提交订单请求
-     * @param $query
-     * @param $headers
-     * @return mixed
-     */
-    public function submitOrderRequest($query, $headers) {
-        // 验证查询
-        $data = [
-            'secretStr'               => urldecode($query[0]),
-            'tour_flag'               => 'dc',
-            'purpose_codes'           => 'ADULT',
-            'query_from_station_name' => $this->trainInfo['fromStation'],
-            'query_to_station_name'   => $this->trainInfo['toStation'],
-            'undefined'               => '',
-//            'train_date'              => '2020-06-13',
-//            'back_train_date'         => '2020-06-10',
-        ];
-        //var_dump($data);
-        // 表单信息获取
-        $submitOrderRequest = CURL(self::$url . 'otn/leftTicket/submitOrderRequest', 1, http_build_query($data), $headers);
-        $submitOrderRequest = json_decode($submitOrderRequest, true);
-        return $submitOrderRequest;
-    }
-
-    /**
-     * 检查订单信息
-     * @param $my_name
-     * @param $my_card
-     * @param $my_phone
-     * @param $repeat_submit_token
-     * @param $headers
-     * @return mixed
-     */
-    public function checkOrderInfo($my_name, $my_card, $my_phone, $repeat_submit_token, $headers) {
-        $info_data = [
-            'cancel_flag'          => 2,
-            'bed_level_order_num' => '000000000000000000000000000000',
-            'passengerTicketStr'  => $this->trainInfo['train_seat'] . ',0,1,' . $my_name . ',1,' . $my_card . ',' . $my_phone . ',N,' . $this->userInfo['user_auth'],
-            'oldPassengerStr'     => $my_name . ',1,' . $my_card . ',1_',
-            'tour_flag'           => 'dc',
-            'randCode'            => '',
-            'whatsSelect'         => 1,
-            '_json_att'           => '',
-            'REPEAT_SUBMIT_TOKEN' => $repeat_submit_token,
-            'sessionId' => '',
-            'sig' => '',
-            'scene' => 'nc_login',
-        ];
-        //var_dump($info_data);
-        $checkOrderInfo = CURL(self::$url . 'otn/confirmPassenger/checkOrderInfo', 1, http_build_query($info_data), $headers);
-        $checkOrderInfo = json_decode($checkOrderInfo, true);
-        return $checkOrderInfo;
-    }
-
-    /**
-     * 确认订单
-     * @param $my_name
-     * @param $my_card
-     * @param $my_phone
-     * @param $key_check_isChange
-     * @param $leftTicketStr
-     * @param $query
-     * @param $repeat_submit_token
-     * @param $headers
-     * @return mixed
-     */
-    public function confirmSingleForQueue($my_name, $my_card, $my_phone, $key_check_isChange, $leftTicketStr, $query, $repeat_submit_token, $headers) {
-        $post_data = [
-            'passengerTicketStr'  => $this->trainInfo['train_seat'] . ',0,1,' . $my_name . ',1,' . $my_card . ',' . $my_phone . ',N,' . $this->userInfo['user_auth'],
-            'oldPassengerStr'     => $my_name . ',1,' . $my_card . ',1_',
-            'randCode'            => '',
-            'purpose_codes'       => '00',
-            'key_check_isChange'  => $key_check_isChange,
-            'leftTicketStr'       => $leftTicketStr,
-            'train_location'      => $query[15],
-            'choose_seats'        => '',
-            'seatDetailType'      => '000',
-            'whatsSelect'         => '1',
-            'roomType'            => '00',
-            'dwAll'               => 'N',
-            '_json_att'           => '',
-            'REPEAT_SUBMIT_TOKEN' => $repeat_submit_token,
-        ];
-        //var_dump($post_data);
-        $confirmSingleForQueue = CURL(self::$url . 'otn/confirmPassenger/confirmSingleForQueue', 1, http_build_query($post_data), $headers);
-        $confirmSingleForQueue = json_decode($confirmSingleForQueue, true);
-        return $confirmSingleForQueue;
-    }
-
-    /**
-     * 订购队列结果
-     * @param $orderId
-     * @param $repeat_submit_token
-     * @param $headers
-     * @return mixed
-     */
-    public function resultOrderForDcQueue($orderId, $repeat_submit_token, $headers) {
-        $url = self::$url . 'otn/confirmPassenger/resultOrderForDcQueue';
-        $request_data = [
-            'orderSequence_no' => $orderId,
-            'REPEAT_SUBMIT_TOKEN' => $repeat_submit_token,
-            '_json_att' => ''
-        ];
-        $resultOrderForDcQueue = CURL($url, 1, http_build_query($request_data), $headers);
-        $resultOrderForDcQueue = json_decode($resultOrderForDcQueue, true);
-        return $resultOrderForDcQueue;
     }
 
     /**
