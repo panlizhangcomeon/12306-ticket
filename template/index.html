@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+<body>
+<h1>12306自助购票系统</h1>
+<div>
+    <h2>个人信息</h2>
+    <form action="http://192.168.10.18:9507/index/addTicketTask">
+        12306账号：<input type="text" name="train_username"><br>
+        12306密码：<input type="text" name="train_password"><br>
+        名字：<input type="text" name="my_name"><br>
+        身份证：<input type="text" name="my_card" placeholder="xxxx***********xxx"><br>
+        手机号：<input type="text" name="my_phone" placeholder="xxx****xxxx"><br>
+        用户身份验证密文：<input type="text" name="user_auth"><font color="red">(在checkOrderInfo接口中提取请求参数passengerTicketStr 的 N, 后面的字符串)</font><br>
+        下图验证码答案: <input type="text" name="verify_code" placeholder="英文逗号隔开，例：1,3"><br>
+        <img src="{$imgSrc}" alt="">
+    <h2>列车信息</h2>
+        起始站：<input type="text" name="fromStation"><br>
+        终点站：<input type="text" name="toStation"><br>
+        出发时间：<input type="text" name="train_date" placeholder="XXXX-XX-XX"><br>
+        车次：<input type="text" name="train_num"><br>
+        车票类型：<input type="text" name="train_type"><font color="red">(all 任意车次任意座位 23软卧一等 动卧 28硬卧二等 软座 29硬座 26无座 32商务特等座 30二等座 31一等座 33高级商务)</font><br>
+        座位类型：<input type="text" name="train_seat"><font color="red">(商务座(9),特等座(P),一等座(M),二等座(O),高级软卧(6),软卧(4),硬卧(3),软座(2),硬座(1),无座(1)  // 注意大小写)</font><br>
+        <input type="submit" value="提交">
+    </form>
+</div>
+</body>
+</html>

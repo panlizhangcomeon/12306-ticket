@@ -354,6 +354,62 @@
         ]
     },
     {
+        "name": "easyswoole/mysqli",
+        "version": "2.2.6",
+        "version_normalized": "2.2.6.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/easy-swoole/mysqli.git",
+            "reference": "177579daeaa3824cdf043035121224870fae57f3"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/easy-swoole/mysqli/zipball/177579daeaa3824cdf043035121224870fae57f3",
+            "reference": "177579daeaa3824cdf043035121224870fae57f3",
+            "shasum": "",
+            "mirrors": [
+                {
+                    "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                    "preferred": true
+                }
+            ]
+        },
+        "require": {
+            "easyswoole/spl": "^1.2"
+        },
+        "require-dev": {
+            "easyswoole/phpunit": "^1.0",
+            "easyswoole/swoole-ide-helper": "^1.2"
+        },
+        "time": "2020-03-13T07:20:33+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "EasySwoole\\Mysqli\\": "src/",
+                "EasySwoole\\Mysqli\\Tests\\": "tests/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "Apache-2.0"
+        ],
+        "authors": [
+            {
+                "name": "YF",
+                "email": "291323003@qq.com"
+            }
+        ],
+        "description": "An efficient swoole framework",
+        "homepage": "https://www.easyswoole.com/",
+        "keywords": [
+            "async",
+            "easyswoole",
+            "framework",
+            "swoole"
+        ]
+    },
+    {
         "name": "easyswoole/session",
         "version": "2.0.7",
         "version_normalized": "2.0.7.0",
@@ -569,6 +625,66 @@
         "description": "A simple Queue implementation integrated into easySwoole",
         "keywords": [
             "easyswoole"
+        ]
+    },
+    {
+        "name": "easyswoole/template",
+        "version": "1.0.8",
+        "version_normalized": "1.0.8.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/easy-swoole/template.git",
+            "reference": "3cc40fb95d8907a98349fc547c83dd5748799f48"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/easy-swoole/template/zipball/3cc40fb95d8907a98349fc547c83dd5748799f48",
+            "reference": "3cc40fb95d8907a98349fc547c83dd5748799f48",
+            "shasum": "",
+            "mirrors": [
+                {
+                    "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                    "preferred": true
+                }
+            ]
+        },
+        "require": {
+            "easyswoole/component": "^2.0",
+            "easyswoole/spl": "^1.0"
+        },
+        "require-dev": {
+            "duncan3dc/blade": "^4.5",
+            "easyswoole/phpunit": "^1.0",
+            "easyswoole/swoole-ide-helper": "^1.1",
+            "league/plates": "3.*",
+            "smarty/smarty": "~3.1",
+            "topthink/think-template": "^2.0"
+        },
+        "time": "2019-10-15T13:58:10+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "EasySwoole\\Template\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "Apache-2.0"
+        ],
+        "authors": [
+            {
+                "name": "YF",
+                "email": "291323003@qq.com"
+            }
+        ],
+        "description": "An efficient swoole framework",
+        "homepage": "https://www.easyswoole.com/",
+        "keywords": [
+            "async",
+            "easyswoole",
+            "framework",
+            "swoole"
         ]
     },
     {
@@ -847,6 +963,71 @@
             "psr-7",
             "request",
             "response"
+        ]
+    },
+    {
+        "name": "smarty/smarty",
+        "version": "v3.1.36",
+        "version_normalized": "3.1.36.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/smarty-php/smarty.git",
+            "reference": "fd148f7ade295014fff77f89ee3d5b20d9d55451"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/smarty-php/smarty/zipball/fd148f7ade295014fff77f89ee3d5b20d9d55451",
+            "reference": "fd148f7ade295014fff77f89ee3d5b20d9d55451",
+            "shasum": "",
+            "mirrors": [
+                {
+                    "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                    "preferred": true
+                }
+            ]
+        },
+        "require": {
+            "php": ">=5.2"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "6.4.1",
+            "smarty/smarty-lexer": "^3.1"
+        },
+        "time": "2020-04-14T14:44:26+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "3.1.x-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "classmap": [
+                "libs/"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "LGPL-3.0"
+        ],
+        "authors": [
+            {
+                "name": "Monte Ohrt",
+                "email": "monte@ohrt.com"
+            },
+            {
+                "name": "Uwe Tews",
+                "email": "uwe.tews@googlemail.com"
+            },
+            {
+                "name": "Rodney Rehm",
+                "email": "rodney.rehm@medialize.de"
+            }
+        ],
+        "description": "Smarty - the compiling PHP template engine",
+        "homepage": "http://www.smarty.net",
+        "keywords": [
+            "templating"
         ]
     }
 ]

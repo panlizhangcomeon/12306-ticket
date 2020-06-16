@@ -1,8 +1,8 @@
 <?php
 namespace App\Service;
 
+use App\Model\Ticket;
 use EasySwoole\Component\Singleton;
-use EasySwoole\Utility\File;
 
 /**
  * 12306通用接口
@@ -14,6 +14,12 @@ class Api {
 
     private static $url = 'https://kyfw.12306.cn/';
     private static $path = EASYSWOOLE_ROOT . '/Data/';
+    private $ticketModel;
+
+    public function __construct()
+    {
+        $this->ticketModel = new Ticket();
+    }
 
     /**
      * 获取站点信息
@@ -94,7 +100,7 @@ class Api {
         $data = CURL($url, 1, $get_data, $headers);
         $arr = json_decode($data, true);
         if (isset($arr['result_code']) && $arr['result_code'] == 0) {
-            file_put_contents(self::$path . 'uamtk.txt', $arr['uamtk']);
+            $this->ticketModel->updateUmatk($username, $arr['uamtk']);
             return true;
         }
         return false;
@@ -103,18 +109,16 @@ class Api {
     /**
      * 验证是否登陆   验证cookie是否有效
      */
-    public function uamtk() {
+    public function uamtk($trainUsername) {
         $url = self::$url . 'passport/web/auth/uamtk';
-        if (!is_file(self::$path . 'uamtk.txt')) {
-            File::touchFile(self::$path . 'uamtk.txt');
-        }
-        $uamtk = file_get_contents(self::$path . 'uamtk.txt');
+        $uamtkData = $this->ticketModel->getTicketLogin($trainUsername);
+        $uamtk = $uamtkData['umatk'] ?? '';
         // 获取newapptk
         $header = ['Cookie:uamtk=' . $uamtk, 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8', 'Referer:https://www.12306.cn/index/index.html'];
         $uamtk = CURL($url, 1, 'appid=otn', $header);
         $uamtk = json_decode($uamtk, true);
         if ($uamtk['result_code'] === 0) {
-            file_put_contents(self::$path . 'newapptk.txt', $uamtk['newapptk']);
+            $this->ticketModel->updateNewApptk($trainUsername, $uamtk['newapptk']);
             return true;
         } else {
             echo $uamtk['result_message'] . PHP_EOL;

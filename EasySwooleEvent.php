@@ -3,10 +3,12 @@ namespace EasySwoole\EasySwoole;
 
 
 use App\Process\TicketGrabbingProcess;
+use App\Service\Smarty;
 use EasySwoole\EasySwoole\Swoole\EventRegister;
 use EasySwoole\EasySwoole\AbstractInterface\Event;
 use EasySwoole\Http\Request;
 use EasySwoole\Http\Response;
+use EasySwoole\Template\Render;
 
 class EasySwooleEvent implements Event
 {
@@ -19,6 +21,10 @@ class EasySwooleEvent implements Event
 
     public static function mainServerCreate(EventRegister $register)
     {
+        //在全局的主服务中创建事件中，实例化该Render,并注入你的驱动配置
+        Render::getInstance()->getConfig()->setRender(new Smarty());
+        Render::getInstance()->getConfig()->setTempDir(EASYSWOOLE_TEMP_DIR);
+        Render::getInstance()->attachServer(ServerManager::getInstance()->getSwooleServer());
         // TODO: Implement mainServerCreate() method.
         $server = ServerManager::getInstance()->getSwooleServer();
         $server->addProcess((new TicketGrabbingProcess('ticketGrabbingProcess'))->getProcess());

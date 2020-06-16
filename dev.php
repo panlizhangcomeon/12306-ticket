@@ -19,5 +19,14 @@ return [
         ]
     ],
     'TEMP_DIR' => '/tmp/swoole/easyswoole-self',
-    'LOG_DIR' => null
+    'LOG_DIR' => null,
+    'mysqli' => [
+        'host'          => '192.168.10.18',
+        'port'          => 3306,
+        'user'          => 'root',
+        'password'      => '12345678',
+        'database'      => 'ticket',
+        'timeout'       => 5,
+        'charset'       => 'utf8mb4',
+    ]
 ];
