@@ -15,12 +15,23 @@ class Ticket {
         }
     }
 
+    /**
+     * 获取未开始的抢票任务
+     * @return array|bool|null
+     * @throws \Throwable
+     */
     public function getTicketProcess() {
         $sql = "select * from ticketProcess where ticket_status = 0 order by id";
         $this->mysqli->queryBuilder()->raw($sql);
         return $this->mysqli->execBuilder();
     }
 
+    /**
+     * 添加抢票任务
+     * @param $params
+     * @return array|bool|null
+     * @throws \Throwable
+     */
     public function addTicketProcess($params) {
         $time = date('Y-m-d H:i:s');
         $sql = "insert into ticketProcess(train_username,train_password,my_name,my_card,my_phone,user_auth,verify_code,fromStation,toStation,train_date,train_num,train_type,train_seat,ticket_status,create_date,update_date) 
@@ -29,12 +40,27 @@ class Ticket {
         return $this->mysqli->execBuilder();
     }
 
-    public function updateTicketProcess($id, $status) {
-        $sql = "update ticketProcess set ticket_status = {$status} where id = {$id}";
+    /**
+     * 更新抢票任务状态
+     * @param $id
+     * @param $status
+     * @param int $tryTimes
+     * @return array|bool|null
+     * @throws \Throwable
+     */
+    public function updateTicketProcess($id, $status, $tryTimes = 0) {
+        $datetime = date('Y-m-d H:i:s');
+        $sql = "update ticketProcess set ticket_status = {$status},update_date = '{$datetime}',try_times = {$tryTimes} where id = {$id}";
         $this->mysqli->queryBuilder()->raw($sql);
         return $this->mysqli->execBuilder();
     }
 
+    /**
+     * 获取验证码
+     * @param $id
+     * @return int
+     * @throws \Throwable
+     */
     public function getVerifyCode($id) {
         $this->mysqli->queryBuilder()->raw("select verify_code from ticketProcess where id = {$id}");
         $result = $this->mysqli->execBuilder();
@@ -44,6 +70,12 @@ class Ticket {
         return 0;
     }
 
+    /**
+     * 获取任务发起人登陆状态
+     * @param $trainUsername
+     * @return array
+     * @throws \Throwable
+     */
     public function getTicketLogin($trainUsername) {
         $this->mysqli->queryBuilder()->raw("select * from ticketLogin where train_username = '{$trainUsername}'");
         $result = $this->mysqli->execBuilder();
@@ -60,7 +92,8 @@ class Ticket {
     }
 
     public function updateNewApptk($trainUsername, $newApptk) {
-        $this->mysqli->queryBuilder()->raw("update ticketLogin set newapptk = '{$newApptk}' where train_username = '{$trainUsername}'");
+        $date = date('Y-m-d H:i:s');
+        $this->mysqli->queryBuilder()->raw("update ticketLogin set newapptk = '{$newApptk}',update_date = '{$date}' where train_username = '{$trainUsername}'");
         return $this->mysqli->execBuilder();
     }
 }

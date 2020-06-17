@@ -164,6 +164,7 @@ class TicketGrabbingProcess extends AbstractProcess {
      * 轮询检测余票并下单通知用户
      * @param $data
      * @param $headers
+     * @throws \Throwable
      */
     public function poll($data, $headers)
     {
@@ -179,7 +180,7 @@ class TicketGrabbingProcess extends AbstractProcess {
         } while (!$res);
 
         echo '抢票成功' . PHP_EOL;
-        $this->ticketModel->updateTicketProcess($data['id'], 1);
+        $this->ticketModel->updateTicketProcess($data['id'], 1, $i - 1);
         //查询未完成订单
         //$this->email();
     }
