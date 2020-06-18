@@ -33,6 +33,7 @@ class Index extends Controller
     /**
      * 增加抢票任务
      * @return bool
+     * @throws \Throwable
      */
     public function addTicketTask() {
         $request = $this->request();
@@ -48,7 +49,8 @@ class Index extends Controller
         }
         $ticketModel = new Ticket();
         $result = $ticketModel->addTicketProcess($params);
-        if ($result) {
+        $res = $ticketModel->addDeviceInfo($params);
+        if ($result && $res) {
             $this->writeJson(200, ['result' => true, 'errMsg' => ''], 'success');
         } else {
             $this->writeJson(200, ['result' => false, 'errMsg' => '插入记录失败'], 'success');

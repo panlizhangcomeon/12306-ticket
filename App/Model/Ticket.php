@@ -16,6 +16,32 @@ class Ticket {
     }
 
     /**
+     * 获取cookie设备信息
+     * @param $username
+     * @return array
+     * @throws \Throwable
+     */
+    public function getDeviceInfo($username) {
+        $sql = "select rail_expiration,rail_deviceid from ticketDevice where user_name = '{$username}'";
+        $this->mysqli->queryBuilder()->raw($sql);
+        $data = $this->mysqli->execBuilder();
+        return $data[0] ?? [];
+    }
+
+    /**
+     * 插入cookie设备信息
+     * @param $params
+     * @return array|bool|null
+     * @throws \Throwable
+     */
+    public function addDeviceInfo($params) {
+        $datetime = date('Y-m-d H:i:s');
+        $sql = "replace into ticketDevice(user_name,rail_expiration,rail_deviceid,create_date,update_date) values('{$params['train_username']}',{$params['rail_expiration']},'{$params['rail_deviceid']}','{$datetime}','{$datetime}')";
+        $this->mysqli->queryBuilder()->raw($sql);
+        return $this->mysqli->execBuilder();
+    }
+
+    /**
      * 获取未开始的抢票任务
      * @return array|bool|null
      * @throws \Throwable

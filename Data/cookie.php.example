@@ -1,9 +1,0 @@
-<?php
-/**
- * Cookie信息(登陆购票支付等必备)
- * 获取方式：登陆12306网站(记住要先登录)，刷新页面F12查看任意XHR请求，从请求的Request Headers中的Cookie提取设备信息
- */
-    return array(
-        'RAIL_EXPIRATION' => xxx, //有效时间
-        'RAIL_DEVICEID' => 'xxxx' //设备ID
-    );

@@ -71,8 +71,8 @@ class TicketGrabbingProcess extends AbstractProcess {
 
     public function handle($data) {
         $this->init(); //初始化站点信息
-        $cookie = include_once (self::$path . 'cookie.php');
-        $loginHeaders = ['Cookie:RAIL_EXPIRATION=' . $cookie['RAIL_EXPIRATION'] . '; RAIL_DEVICEID=' . $cookie['RAIL_DEVICEID']];
+        $deviceInfo = $this->ticketModel->getDeviceInfo($data['train_username']);
+        $loginHeaders = ['Cookie:RAIL_EXPIRATION=' . $deviceInfo['rail_expiration'] . '; RAIL_DEVICEID=' . $deviceInfo['rail_deviceid']];
 
         //检查登陆状态，状态异常则重新登陆
         if (!Api::getInstance()->uamtk($data['train_username'])) {
@@ -126,6 +126,7 @@ class TicketGrabbingProcess extends AbstractProcess {
      * @param $data
      * @param $loginHeaders
      * @return bool|mixed
+     * @throws \Throwable
      */
     public function getLoginStorage($data, $loginHeaders) {
         $verifyCode = $this->ticketModel->getVerifyCode($data['id']);

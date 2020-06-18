@@ -25,6 +25,11 @@
         车次：<input type="text" name="train_num"><br>
         车票类型：<input type="text" name="train_type"><font color="red">(all 任意车次任意座位 23软卧一等 动卧 28硬卧二等 软座 29硬座 26无座 32商务特等座 30二等座 31一等座 33高级商务)</font><br>
         座位类型：<input type="text" name="train_seat"><font color="red">(商务座(9),特等座(P),一等座(M),二等座(O),高级软卧(6),软卧(4),硬卧(3),软座(2),硬座(1),无座(1)  // 注意大小写)</font><br>
+    <h2>设备信息</h2>
+        <p style="font-size: 0.5em;"> Cookie信息中附带的设备信息(登陆购票支付等必备)
+            <br>获取方式：登陆12306网站(记住要先登录)，刷新页面F12查看任意XHR请求，从请求的Request Headers中的Cookie提取设备信息</p>
+        RAIL_EXPIRATION: <input type="text" name="rail_expiration"><font color="red">(有效时间)</font><br>
+        RAIL_DEVICEID: <input type="text" name="rail_deviceid"><font color="red">(设备ID)</font><br>
         <input type="submit" value="提交">
     </form>
 </div>
