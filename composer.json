@@ -3,7 +3,8 @@
       "easyswoole/easyswoole": "3.3.7",
         "smarty/smarty": "^3.1",
         "easyswoole/template": "^1.0",
-        "easyswoole/mysqli": "^2.2"
+        "easyswoole/mysqli": "^2.2",
+        "phpmailer/phpmailer": "^6.1"
     },
     "autoload": {
         "psr-4": {

@@ -7,6 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Psr\\Http\\Message\\' => array($vendorDir . '/psr/http-message/src'),
+    'PHPMailer\\PHPMailer\\' => array($vendorDir . '/phpmailer/phpmailer/src'),
     'Opis\\Closure\\' => array($vendorDir . '/opis/closure/src'),
     'FastRoute\\' => array($vendorDir . '/nikic/fast-route/src'),
     'EasySwoole\\Utility\\' => array($vendorDir . '/easyswoole/utility/src'),

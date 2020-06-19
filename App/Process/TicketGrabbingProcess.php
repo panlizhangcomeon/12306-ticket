@@ -3,6 +3,7 @@ namespace App\Process;
 
 use App\Model\Ticket;
 use App\Service\Api;
+use App\Service\Mailer;
 use EasySwoole\Component\Process\AbstractProcess;
 use EasySwoole\EasySwoole\Config;
 use EasySwoole\Mysqli\Client;
@@ -182,8 +183,7 @@ class TicketGrabbingProcess extends AbstractProcess {
 
         echo '抢票成功' . PHP_EOL;
         $this->ticketModel->updateTicketProcess($data['id'], 1, $i - 1);
-        //查询未完成订单
-        //$this->email();
+        Mailer::getInstance()->sendEmail('***@***.com', '抢票成功提醒邮件', '您已成功抢票，请及时前往12306处理订单');
     }
 
     /**
