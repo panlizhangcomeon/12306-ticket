@@ -1,6 +1,8 @@
 # 12306-tickets
 12306抢票(EasySwoole实现)  
-使用方法：  
+使用方法：   
+MySQL 命令行 导入ticket.sql文件  
+命令：source {$path}  
 php easyswoole start 启动  
 详细命令可点击EasySwoole官网 https://www.easyswoole.com/  
 访问 http://ip:端口/index/ticket  
