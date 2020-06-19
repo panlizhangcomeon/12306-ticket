@@ -24,10 +24,22 @@ class Index extends Controller
         $this->response()->write(file_get_contents($file));
     }
 
+    /**
+     * 抢票任务表单页
+     */
     public function ticket() {
         $captchaImg = Api::getInstance()->captchaImage();
         $imgSrc = $captchaImg['image'];
         $this->response()->write(Render::getInstance()->render('index.html', ['imgSrc' => 'data:image/jpg;base64,' . $imgSrc]));
+    }
+
+    /**
+     * 刷新验证码图片
+     */
+    public function refreshCaptcha() {
+        $captchaImg = Api::getInstance()->captchaImage();
+        $imgSrc = $captchaImg['image'];
+        return $this->writeJson(200, ['result' => true, 'imgSrc' => 'data:image/jpg;base64,' . $imgSrc], 'success');
     }
 
     /**

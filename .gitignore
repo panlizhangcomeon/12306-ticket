@@ -1,9 +1,5 @@
 .idea/
-Log/
 nbproject/*
+Log/
 composer.lock
-Temp/
-Data/*.php
-Data/*.jpg
-Data/*.txt
 template/smarty/*
